@@ -1,0 +1,14 @@
+import { NextResponse, type NextRequest } from 'next/server';
+
+// Proxy ini sengaja dibuat pass-through.
+// Proteksi autentikasi ditangani di sisi client (AuthGuard component)
+// karena Supabase menyimpan session di localStorage, bukan cookie.
+export async function proxy(request: NextRequest) {
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+};
