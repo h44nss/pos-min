@@ -16,6 +16,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "SarePOS - Coffee Shop POS",
   description: "Sistem Point of Sale Sederhana untuk Coffee Shop",
+  icons: {
+    icon: "/icon.webp",
+  },
 };
 
 export default function RootLayout({
