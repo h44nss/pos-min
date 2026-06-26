@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/utils/format';
-import { QrCode, Banknote, X, CheckCircle2 } from 'lucide-react';
+import { QrCode, Banknote, X, CheckCircle2, Loader2 } from 'lucide-react';
+import { getStoreSettings } from '@/lib/settings';
+import { StoreSetting } from '@/types';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -14,13 +16,30 @@ export default function PaymentModal({ isOpen, onClose, totalAmount, method, onS
   const [receivedAmount, setReceivedAmount] = useState<string>('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [qrisUrl, setQrisUrl] = useState<string | null>(null);
+  const [isLoadingQris, setIsLoadingQris] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setReceivedAmount('');
       setIsSuccess(false);
+      
+      if (method === 'QRIS') {
+        const fetchQris = async () => {
+          setIsLoadingQris(true);
+          try {
+            const settings = await getStoreSettings();
+            setQrisUrl(settings?.qris_image_url || null);
+          } catch (e) {
+            console.error('Failed to fetch QRIS', e);
+          } finally {
+            setIsLoadingQris(false);
+          }
+        };
+        fetchQris();
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, method]);
 
   if (!isOpen) return null;
 
@@ -103,12 +122,26 @@ export default function PaymentModal({ isOpen, onClose, totalAmount, method, onS
 
           {method === 'QRIS' ? (
             <div className="flex flex-col items-center w-full">
-              <div className="bg-gray-50 p-6 rounded-2xl border-2 border-dashed border-gray-200 mb-6 flex flex-col items-center justify-center">
-                {/* Placeholder for real QR Code */}
-                <div className="w-48 h-48 sm:w-64 sm:h-64 bg-white border border-gray-200 shadow-sm rounded-xl flex items-center justify-center">
-                  <QrCode className="w-24 h-24 text-gray-300" />
-                </div>
-                <p className="mt-4 text-sm text-gray-500 font-medium">Scan QRIS ini menggunakan aplikasi M-Banking atau E-Wallet.</p>
+              <div className="bg-gray-50 p-6 rounded-2xl border-2 border-dashed border-gray-200 mb-6 flex flex-col items-center justify-center min-h-[300px]">
+                {isLoadingQris ? (
+                  <div className="flex flex-col items-center justify-center text-gray-400">
+                    <Loader2 className="w-8 h-8 animate-spin mb-2" />
+                    <span className="text-sm font-medium">Memuat QRIS...</span>
+                  </div>
+                ) : qrisUrl ? (
+                  <div className="w-64 h-64 sm:w-80 sm:h-80 bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden flex items-center justify-center p-2">
+                    <img src={qrisUrl} alt="QRIS Toko" className="w-full h-full object-contain" />
+                  </div>
+                ) : (
+                  <div className="w-64 h-64 sm:w-80 sm:h-80 bg-white border border-gray-200 shadow-sm rounded-xl flex items-center justify-center">
+                    <QrCode className="w-32 h-32 text-gray-300" />
+                  </div>
+                )}
+                
+                {(!isLoadingQris && !qrisUrl) && (
+                  <p className="mt-4 text-sm text-red-500 font-medium">QRIS belum diatur di Pengaturan Toko.</p>
+                )}
+                <p className="mt-2 text-sm text-gray-500 font-medium">Scan QRIS ini menggunakan aplikasi M-Banking atau E-Wallet.</p>
               </div>
               
               <button 

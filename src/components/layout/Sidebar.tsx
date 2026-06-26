@@ -16,7 +16,8 @@ import {
   FileText,
   User,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Settings
 } from 'lucide-react';
 
 export default function Sidebar({ className = '' }: { className?: string }) {
@@ -40,6 +41,7 @@ export default function Sidebar({ className = '' }: { className?: string }) {
     { name: 'Laporan', href: '/laporan', icon: BarChart3 },
     { name: 'Pengguna', href: '/users', icon: Users },
     { name: 'Audit Log', href: '/audit-log', icon: FileText },
+    { name: 'Pengaturan', href: '/pengaturan', icon: Settings },
     { name: 'Profil', href: '/profil', icon: User },
   ];
 
@@ -60,7 +62,7 @@ export default function Sidebar({ className = '' }: { className?: string }) {
         <ul className="space-y-1">
           {menuItems.map((item) => {
             // Hide restricted items for KASIR
-            if (profile?.role === 'KASIR' && ['/dashboard', '/kategori', '/produk', '/laporan', '/users', '/audit-log'].includes(item.href)) {
+            if (profile?.role === 'KASIR' && ['/dashboard', '/kategori', '/produk', '/laporan', '/users', '/audit-log', '/pengaturan'].includes(item.href)) {
               return null;
             }
 

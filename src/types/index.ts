@@ -70,3 +70,9 @@ export interface CartItem {
   product: Product;
   quantity: number;
 }
+
+export interface StoreSetting {
+  id: string;
+  qris_image_url: string | null;
+  updated_at: string;
+}

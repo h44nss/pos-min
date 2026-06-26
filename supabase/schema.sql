@@ -188,7 +188,27 @@ CREATE POLICY "owner_delete_product_images"
   ON storage.objects FOR DELETE USING (bucket_id = 'product-images' AND auth.role() = 'authenticated');
 
 -- -------------------------------------------------------
--- 11. SEED DATA AWAL (Opsional)
+-- 11. TABEL STORE_SETTINGS (Pengaturan Toko)
+-- -------------------------------------------------------
+CREATE TABLE public.store_settings (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  qris_image_url  TEXT,
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.store_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "all_read_store_settings" 
+  ON public.store_settings FOR SELECT USING (auth.role() = 'authenticated');
+  
+CREATE POLICY "owner_manage_store_settings" 
+  ON public.store_settings FOR ALL USING (get_my_role() = 'OWNER');
+
+-- Insert default row
+INSERT INTO public.store_settings (qris_image_url) VALUES (NULL);
+
+-- -------------------------------------------------------
+-- 12. SEED DATA AWAL (Opsional)
 -- -------------------------------------------------------
 INSERT INTO public.categories (name) VALUES
   ('Kopi'), ('Non-Kopi'), ('Makanan'), ('Snack');
